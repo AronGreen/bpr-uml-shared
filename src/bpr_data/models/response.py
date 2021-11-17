@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from ..models.mongo_document_base import SerializableObject
+from src.bpr_data.models.mongo_document_base import SerializableObject
 
 
 @dataclass

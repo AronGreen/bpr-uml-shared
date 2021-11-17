@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
-from ..models.mongo_document_base import MongoDocumentBase
+from src.bpr_data.models.mongo_document_base import MongoDocumentBase
 
 
 @dataclass
