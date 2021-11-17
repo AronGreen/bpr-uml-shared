@@ -14,6 +14,8 @@ class Collection(Enum):
     PROJECT = 'project'
     TESTING = 'testing'
     DIAGRAM = 'diagram'
+    MODEL = 'model'
+    MODEL_REPRESENTATION = 'model_representation'
 
 
 class Repository:
@@ -192,7 +194,6 @@ class Repository:
             {'_id': ObjectId(document_id)},
             {'$pull': {field_name: item}}
         )
-        col = self.__get_collection(collection)
 
         return update_result.modified_count > 0
 
