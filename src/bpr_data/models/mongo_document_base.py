@@ -53,6 +53,15 @@ class SerializableObject:
 
 
 @dataclass
+class ObjectIdReferencer(SerializableObject):
+    @classmethod
+    def to_object_ids(cls, field_name: str, objects: list):
+        for obj in objects:
+            setattr(obj, field_name, ObjectId(getattr(obj, field_name)))
+        return objects
+
+
+@dataclass
 class MongoDocumentBase(SerializableObject):
     """
     Represents a base mongo document with an _id property.
