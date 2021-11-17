@@ -4,6 +4,3 @@ requires = [
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
-[options]
-install_requires =
-    pymongo
