@@ -10,7 +10,13 @@ Use pip as normal:
 
 when updating the package, just uninstall it first:
 
-`pip uninstall bpr-uml-shared`
+```
+pip uninstall -y bpr-uml-shared
+pip install git+https://github.com/AronGreen/bpr-uml-shared.git#egg=bpr-uml-shared
+
+```
+
+
 
 ## Development
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum
 import pymongo as mongo
 from bson.objectid import ObjectId
@@ -29,7 +31,7 @@ class Repository:
     _default_db = ""
 
     @staticmethod
-    def get_instance(protocol, user, pw, host, default_db):
+    def get_instance(protocol, user, pw, host, default_db) -> Repository:
         if Repository.__instance is None:
             Repository(protocol, user, pw, host, default_db)
         return Repository.__instance
