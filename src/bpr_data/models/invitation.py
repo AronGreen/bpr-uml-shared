@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from bson.objectid import ObjectId
-from src.bpr_data.models.mongo_document_base import MongoDocumentBase
+from mongo_document_base import MongoDocumentBase
 
 
 @dataclass
