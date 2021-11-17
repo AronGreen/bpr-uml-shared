@@ -2,7 +2,7 @@ from enum import Enum
 import pymongo as mongo
 from bson.objectid import ObjectId
 
-from models.mongo_document_base import MongoDocumentBase, SerializableObject
+from .models.mongo_document_base import MongoDocumentBase, SerializableObject
 
 
 class Collection(Enum):

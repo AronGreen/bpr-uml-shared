@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from mongo_document_base import MongoDocumentBase
+from .mongo_document_base import MongoDocumentBase
 
 
 @dataclass

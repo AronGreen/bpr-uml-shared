@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from bson.objectid import ObjectId
-from mongo_document_base import MongoDocumentBase, SerializableObject
+from .mongo_document_base import MongoDocumentBase, SerializableObject
 
 
 @dataclass

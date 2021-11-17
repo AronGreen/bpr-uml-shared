@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from bson import ObjectId
-from mongo_document_base import MongoDocumentBase
+from .mongo_document_base import MongoDocumentBase
 
 
 @dataclass

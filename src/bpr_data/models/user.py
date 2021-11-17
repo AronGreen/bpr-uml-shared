@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from mongo_document_base import MongoDocumentBase
+from .mongo_document_base import MongoDocumentBase
 
 
 @dataclass
