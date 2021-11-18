@@ -80,7 +80,7 @@ class AddAttributeAction(ModelHistoryBaseAction):
 
 @dataclass
 class RemoveAttributeAction(ModelHistoryBaseAction):
-    attribute: ModelAttribute
+    attributeId: ObjectId
     action: str = "removeAttribute"
 
 
