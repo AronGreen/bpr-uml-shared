@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+
 from bson import ObjectId
 
-from .mongo_document_base import MongoDocumentBase
+from .mongo_document_base import MongoDocumentBase, SerializableObject
 
 
 @dataclass
@@ -16,8 +17,10 @@ class Model(MongoDocumentBase):
     that can convert json or dict into the concrete model
     """
     type = None
-    path: str
     projectId: ObjectId
+    path: str
+    history: list
+
     @staticmethod
     def parse(data: str | dict):
         """
@@ -34,9 +37,12 @@ class Model(MongoDocumentBase):
 
         t = data['type']
         del data['type']
+
         # Add additional types here
-        if t == TextBox.type:
-            return TextBox.from_dict(data)
+        if t == TextBoxModel.type:
+            return TextBoxModel.from_dict(data)
+        if t == ClassModel.type:
+            return ClassModel.from_dict(data)
 
 
 @dataclass
@@ -54,11 +60,53 @@ class FullModelRepresentation(ModelRepresentation):
     model: Model
 
 
-# SUBCLASSES
-# remember to add type field!
+# MODEL ACTIONS
+# remember to add action field!
+
 @dataclass
-class TextBox(Model):
+class ModelHistoryBaseAction(SerializableObject):
+    timestamp: str
+    userId: ObjectId
+    action = None
+
+
+@dataclass
+class CreateAction(ModelHistoryBaseAction):
+    action = "create"
+
+
+@dataclass
+class AddAttributeAction(ModelHistoryBaseAction):
+    attribute: ModelAttribute
+    action = "addAttribute"
+
+
+@dataclass
+class RemoveAttributeAction(ModelHistoryBaseAction):
+    attribute: ModelAttribute
+    action = "removeAttribute"
+
+
+# CONCRETE MODEL CLASSES
+# remember to add type field!
+
+@dataclass
+class ClassModel(Model):
+    attributes: list  # type: ModelAttribute
+    # methods: list
+    type: str = 'class'
+
+
+@dataclass
+class TextBoxModel(Model):
     text: str
     type: str = 'textBox'
 
 
+# MODEL PROPERTY TYPES
+
+@dataclass
+class ModelAttribute(MongoDocumentBase):
+    name: str
+    type: str
+    accessModifier: str
