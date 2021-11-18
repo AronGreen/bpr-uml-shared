@@ -137,8 +137,14 @@ class Repository:
         :return: updated item
         """
         query = {'_id': item.id}
-        values = {'$set': item.as_dict()}
+
+        update_values = item.as_dict()
+        if '_id' in update_values:
+            del update_values['_id']
+        values = {'$set': update_values}
+
         update_result = self.__get_collection(collection).update_one(query, values)
+        # TODO: consider removing this check. Maybe add a return value indicating that a change has happened
         if update_result.modified_count > 0:
             return self.find_one(collection, _id=item.id)
 
