@@ -72,19 +72,19 @@ class ModelHistoryBaseAction(SerializableObject):
 
 @dataclass
 class CreateAction(ModelHistoryBaseAction):
-    action = "create"
+    action: str = "create"
 
 
 @dataclass
 class AddAttributeAction(ModelHistoryBaseAction):
     attribute: ModelAttribute
-    action = "addAttribute"
+    action: str = "addAttribute"
 
 
 @dataclass
 class RemoveAttributeAction(ModelHistoryBaseAction):
     attribute: ModelAttribute
-    action = "removeAttribute"
+    action: str = "removeAttribute"
 
 
 # CONCRETE MODEL CLASSES
