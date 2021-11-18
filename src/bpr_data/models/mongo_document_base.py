@@ -41,9 +41,8 @@ class SerializableObject:
         :return: instance of the calling class
         """
         dict_copy = {}
-        field_names = [x.name for x in fields(cls)]
         for key in d:
-            if key in field_names:
+            if cls.has_field(key):
                 dict_copy[key] = d[key]
         return cls(**dict_copy)
 
@@ -92,6 +91,10 @@ class SerializableObject:
         :return:
         """
         return cls.from_dict(json.loads(j))
+
+    @classmethod
+    def has_field(cls, field_name: str):
+        return field_name in [x.name for x in fields(cls)]
 
     def get_fields(self):
         return fields(self)

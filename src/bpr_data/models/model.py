@@ -35,13 +35,10 @@ class Model(MongoDocumentBase):
         if 'type' not in data:
             raise KeyError
 
-        t = data['type']
-        del data['type']
-
         # Add additional types here
-        if t == TextBoxModel.type:
+        if data['type'] == TextBoxModel.type:
             return TextBoxModel.from_dict(data)
-        if t == ClassModel.type:
+        if data['type'] == ClassModel.type:
             return ClassModel.from_dict(data)
 
 
