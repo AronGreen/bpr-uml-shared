@@ -18,7 +18,6 @@ class Model(MongoDocumentBase):
     type = None
     path: str
     projectId: ObjectId
-
     @staticmethod
     def parse(data: str | dict):
         """
