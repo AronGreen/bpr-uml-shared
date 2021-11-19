@@ -8,14 +8,18 @@ Use pip as normal:
 
 `pip install git+https://github.com/AronGreen/bpr-uml-shared.git#egg=bpr-uml-shared`
 
-when updating the package, just uninstall it first:
+when updating the package, it is necessary to uninstall the package, update requirements.txt, install the package and lastly install again.
+
+Like this:
 
 ```
 pip uninstall -y bpr-uml-shared
+pip freeze | Out-File requirements.txt
 pip install git+https://github.com/AronGreen/bpr-uml-shared.git#egg=bpr-uml-shared
-
+pip freeze | Out-File requirements.txt
 ```
 
+The reason is that pip will specify a specific commit in requirements.txt and will not update it if pip freeze is only run in the last step.
 
 
 ## Development
