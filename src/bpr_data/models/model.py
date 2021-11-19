@@ -74,7 +74,7 @@ class CreateAction(ModelHistoryBaseAction):
 
 @dataclass
 class AddFieldAction(ModelHistoryBaseAction):
-    filed: ModelField
+    field: ModelField
     action: str = "addField"
 
 
@@ -86,7 +86,7 @@ class RemoveFieldAction(ModelHistoryBaseAction):
 
 @dataclass
 class AddMethodAction(ModelHistoryBaseAction):
-    filed: ModelField
+    field: ModelField
     action: str = "addMethod"
 
 
