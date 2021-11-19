@@ -73,15 +73,33 @@ class CreateAction(ModelHistoryBaseAction):
 
 
 @dataclass
-class AddAttributeAction(ModelHistoryBaseAction):
-    attribute: ModelField
-    action: str = "addAttribute"
+class AddFieldAction(ModelHistoryBaseAction):
+    filed: ModelField
+    action: str = "addField"
 
 
 @dataclass
-class RemoveAttributeAction(ModelHistoryBaseAction):
-    attributeId: ObjectId
-    action: str = "removeAttribute"
+class RemoveFieldAction(ModelHistoryBaseAction):
+    fieldId: ObjectId
+    action: str = "removeField"
+
+
+@dataclass
+class AddMethodAction(ModelHistoryBaseAction):
+    filed: ModelField
+    action: str = "addMethod"
+
+
+@dataclass
+class RemoveMethodAction(ModelHistoryBaseAction):
+    fieldId: ObjectId
+    action: str = "removeMethod"
+
+
+@dataclass
+class SetNameAction(ModelHistoryBaseAction):
+    name: str
+    action: str = "setName"
 
 
 # CONCRETE MODEL CLASSES
