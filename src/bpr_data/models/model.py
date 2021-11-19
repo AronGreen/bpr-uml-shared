@@ -74,7 +74,7 @@ class CreateAction(ModelHistoryBaseAction):
 
 @dataclass
 class AddAttributeAction(ModelHistoryBaseAction):
-    attribute: ModelAttribute
+    attribute: ModelField
     action: str = "addAttribute"
 
 
@@ -89,8 +89,9 @@ class RemoveAttributeAction(ModelHistoryBaseAction):
 
 @dataclass
 class ClassModel(Model):
-    attributes: list  # type: ModelAttribute
-    # methods: list
+    name: str
+    fields: list  # type: ModelField
+    methods: list  # type: ModelMethod
     type: str = 'class'
 
 
@@ -103,7 +104,14 @@ class TextBoxModel(Model):
 # MODEL PROPERTY TYPES
 
 @dataclass
-class ModelAttribute(MongoDocumentBase):
+class ModelField(MongoDocumentBase):
+    name: str
+    type: str
+    accessModifier: str
+
+
+@dataclass
+class ModelMethod(MongoDocumentBase):
     name: str
     type: str
     accessModifier: str
