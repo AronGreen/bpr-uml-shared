@@ -258,6 +258,17 @@ class Repository:
         result = self.__get_collection(local_collection).aggregate(pipeline)
         return list(result)
 
+    def aggregate(self, collection: Collection, pipeline: list) -> dict | list:
+        """
+        Build custom aggregations on a collection.
+        Pass aggregation stages as a dict list to the pipeline argument.
+        See https://docs.mongodb.com/manual/core/aggregation-pipeline/ for more information on the aggregation pipeline.
+        :param collection: collection to aggregate on
+        :param pipeline: list of dicts
+        :return: result of aggregation
+        """
+        return self.__get_collection(collection).aggregate(pipeline=pipeline)
+
     def __get_collection(self, collection: Collection):
         if self.__client is None:
             self.__client = mongo.MongoClient(
