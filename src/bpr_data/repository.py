@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import TypeVar, Type
+
 import pymongo as mongo
 from bson.objectid import ObjectId
 
@@ -20,6 +22,9 @@ class Collection(Enum):
     MODEL_REPRESENTATION = 'model_representation'
 
 
+T = TypeVar('T', bound=SerializableObject)
+
+
 class Repository:
     __instance = None
     __client = None
@@ -36,7 +41,8 @@ class Repository:
             Repository(protocol, user, pw, host, default_db)
         return Repository.__instance
 
-    def __init__(self, protocol, user, pw, host, default_db):
+    def __init__(self,
+                 protocol, user, pw, host, default_db):
         if Repository.__instance is not None:
             raise Exception("Singleton class! Use get_instance()")
         else:
@@ -47,12 +53,16 @@ class Repository:
             Repository._host = host
             Repository._default_db = default_db
 
-    def insert(self, collection: Collection, item: MongoDocumentBase) -> dict:
+    def insert(self,
+               collection: Collection,
+               item: MongoDocumentBase,
+               return_type: Type[T] = None) -> dict | Type[T]:
         """
         Inserts a document into the given collection.
         Note that the _id field will be ignored on insertion
         :param collection: Collection to insert into
         :param item: the item to insert
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: the inserted item with its given id
         """
         d = item.as_dict()
@@ -63,15 +73,22 @@ class Repository:
 
         result = self.__get_collection(collection).insert_one(d)
         if result.acknowledged:
-            return self.find_one(collection, _id=result.inserted_id)
+            result = self.find_one(collection, _id=result.inserted_id)
+            if return_type is not None:
+                return return_type.from_dict(result)
+            return result
 
-    def find(self, collection: Collection, **kwargs) -> list:
+    def find(self,
+             collection: Collection,
+             return_type: Type[T] = None,
+             **kwargs) -> list:
         """
         Find all items matching the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
         A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query as `_id`.
         :param collection: collection to search
         :param kwargs: search params in key-value form
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: the resulting list of items as dicts
         """
         if kwargs.get('id') is not None:
@@ -85,15 +102,22 @@ class Repository:
                 kwargs[item] = nested_conditions[item]
             kwargs.pop("nested_conditions")
 
-        return list(self.__get_collection(collection).find(kwargs))
+        results = list(self.__get_collection(collection).find(kwargs))
+        if return_type is not None:
+            return return_type.from_dict_list(results)
+        return results
 
-    def find_one(self, collection: Collection, **kwargs) -> dict:
+    def find_one(self,
+                 collection: Collection,
+                 return_type: Type[T] = None,
+                 **kwargs) -> dict | Type[T]:
         """
         Find the first item that matches the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
         A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query as `_id`.
         :param collection: collection to search
         :param kwargs: search params in key-value form
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: the first item matching the query
         """
         if kwargs.get('id') is not None:
@@ -101,9 +125,14 @@ class Repository:
                 kwargs['_id'] = ObjectId(kwargs['id'])
             del kwargs['id']
 
-        return self.__get_collection(collection).find_one(kwargs)
+        result = self.__get_collection(collection).find_one(kwargs)
+        if return_type is not None:
+            return return_type.from_dict(result)
+        return result
 
-    def delete(self, collection: Collection, **kwargs) -> bool:
+    def delete(self,
+               collection: Collection,
+               **kwargs) -> bool:
         """
         Delete the first item that matches the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
@@ -128,12 +157,16 @@ class Repository:
         """
         self.__get_collection(collection).delete_many({})
 
-    def update(self, collection: Collection, item: MongoDocumentBase) -> dict:
+    def update(self,
+               collection: Collection,
+               item: MongoDocumentBase,
+               return_type: Type[T] = None) -> dict | Type[T]:
         """
         Updates a document with new values.
         Document is found by _id
         :param collection: collection to query
         :param item: item to update
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: updated item
         """
         query = {'_id': item.id}
@@ -144,9 +177,16 @@ class Repository:
         values = {'$set': update_values}
 
         self.__get_collection(collection).update_one(query, values)
-        return self.find_one(collection, _id=item.id)
+        result = self.find_one(collection, _id=item.id)
+        if return_type is not None:
+            return return_type.from_dict(result)
+        return result
 
-    def push(self, collection: Collection, document_id: ObjectId, field_name: str, item) -> bool:
+    def push(self,
+             collection: Collection,
+             document_id: ObjectId,
+             field_name: str,
+             item) -> bool:
         """
         Inserts an item into a list on a document.
         :rtype: object
@@ -166,7 +206,11 @@ class Repository:
         )
         return update_result.modified_count > 0
 
-    def push_list(self, collection: Collection, document_id: ObjectId, field_name: str, items: list) -> bool:
+    def push_list(self,
+                  collection: Collection,
+                  document_id: ObjectId,
+                  field_name: str,
+                  items: list) -> bool:
         """
         Inserts item into a list on a document.
         :rtype: object
@@ -187,7 +231,11 @@ class Repository:
             )
             return update_result.modified_count > 0
 
-    def pull(self, collection: Collection, document_id: ObjectId, field_name: str, item) -> bool:
+    def pull(self,
+             collection: Collection,
+             document_id: ObjectId,
+             field_name: str,
+             item) -> bool:
         """
         Removes an item from a list on a document.
         :param collection: collection to query
@@ -203,15 +251,15 @@ class Repository:
 
         return update_result.modified_count > 0
 
-    def join(
-            self,
-            local_collection: Collection,
-            local_field: str,
-            foreign_collection: Collection,
-            foreign_field: str,
-            to_field: str,
-            unwind: bool = False,
-            **match_args) -> list:
+    def join(self,
+             local_collection: Collection,
+             local_field: str,
+             foreign_collection: Collection,
+             foreign_field: str,
+             to_field: str,
+             unwind: bool = False,
+             return_type: Type[T] = None,
+             **match_args) -> list:
         """
         Returns results from the `local_collection` with the matching documents in the `foreign_collection` as sub-documents.
 
@@ -231,6 +279,7 @@ class Repository:
         :param to_field: field containing the results of the join
         :param unwind: if true, unwinds on to_field
         :param match_args: arguments to filter local collection by
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: list of resulting documents
         """
 
@@ -255,19 +304,28 @@ class Repository:
         if unwind:
             pipeline.append({'$unwind': f'${to_field}'})
 
-        result = self.__get_collection(local_collection).aggregate(pipeline)
-        return list(result)
+        result = list(self.__get_collection(local_collection).aggregate(pipeline))
+        if return_type is not None:
+            return return_type.from_dict_list(result)
+        return result
 
-    def aggregate(self, collection: Collection, pipeline: list) -> dict | list:
+    def aggregate(self,
+                  collection: Collection,
+                  pipeline: list, 
+                  return_type: Type[T] = None) -> list:
         """
         Build custom aggregations on a collection.
         Pass aggregation stages as a dict list to the pipeline argument.
         See https://docs.mongodb.com/manual/core/aggregation-pipeline/ for more information on the aggregation pipeline.
         :param collection: collection to aggregate on
         :param pipeline: list of dicts
+        :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: result of aggregation
         """
-        return self.__get_collection(collection).aggregate(pipeline=pipeline)
+        result = list(self.__get_collection(collection).aggregate(pipeline=pipeline))
+        if return_type is not None:
+            return return_type.from_dict_list(result)
+        return result
 
     def __get_collection(self, collection: Collection):
         if self.__client is None:
