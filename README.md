@@ -18,6 +18,10 @@ pip freeze | Out-File requirements.txt
 pip install git+https://github.com/AronGreen/bpr-uml-shared.git#egg=bpr-uml-shared
 pip freeze | Out-File requirements.txt
 ```
+as one line: 
+```
+pip uninstall -y bpr-uml-shared && "---- package uninstalled ----" && pip freeze | Out-File requirements.txt && "---- requirements frozen ----" && pip install git+https://github.com/AronGreen/bpr-uml-shared.git#egg=bpr-uml-shared && "---- package reinstalled ----" && pip freeze | Out-File requirements.txt && "---- requirements frozen ----"
+```
 
 The reason is that pip will specify a specific commit in requirements.txt and will not update it if pip freeze is only run in the last step.
 
