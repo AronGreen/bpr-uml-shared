@@ -27,23 +27,27 @@ class SerializableObject:
         return json.dumps(asdict(self), default=str)
 
     @classmethod
-    def from_dict(cls, d: dict):
+    def from_dict(cls, d: dict, set_missing_to_none: bool = False):
         """
         Converts a dictionary to an instance of the calling class.
 
         Ignores dict fields that are not defined as fields on the calling class.
 
-        Will fail if all required fields are not present in the dict
-
-        Future: Consider adding an option to set missing fields to None
+        Will fail if all required fields are not present in the dict unless set_missing_to_none is set to True
+        in which case missing fields will be initialized to None
 
         :param d: dictionary to convert
+        :param set_missing_to_none: If True, sets missing fields in dict to None
         :return: instance of the calling class
         """
         dict_copy = {}
         for key in d:
             if cls.has_field(key):
                 dict_copy[key] = d[key]
+        if set_missing_to_none:
+            for key in [x.name for x in fields(cls)]:
+                if key not in dict_copy:
+                    dict_copy[key] = None
         return cls(**dict_copy)
 
     @classmethod

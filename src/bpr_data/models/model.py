@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
+from typing import TypeVar
 
 from bson import ObjectId
 
@@ -10,36 +10,12 @@ from .mongo_document_base import MongoDocumentBase, SerializableObject
 
 @dataclass
 class Model(MongoDocumentBase):
-    """
-    Base class for all model types.
-    Classes inheriting from this class must specify the field `type` with the class name in camelCase.
-    In addition to the conversion methods inherited from MongoDocumentBase, a parse method is added
-    that can convert json or dict into the concrete model
-    """
-    type = None
+    type: str
     projectId: ObjectId
     path: str
-    history: list
-
-    @staticmethod
-    def parse(data: str | dict):
-        """
-        Converts the given data to the correct type inferred by the `type` field in the data.
-        :param data: json or dict with a representation of a subclass of Model
-        :return: the parsed Model subclass
-        """
-        if type(data) is str:
-            data = json.loads(data)
-        if type(data) is not dict:
-            raise TypeError
-        if 'type' not in data:
-            raise KeyError
-
-        # Add additional types here
-        if data['type'] == TextBoxModel.type:
-            return TextBoxModel.from_dict(data)
-        if data['type'] == ClassModel.type:
-            return ClassModel.from_dict(data)
+    history: list  # type: HistoryBaseAction
+    relations: list  # type: Relation
+    attributes: list  # type: AttributeBase
 
 
 @dataclass
@@ -57,79 +33,101 @@ class FullModelRepresentation(ModelRepresentation):
     model: Model
 
 
+@dataclass
+class Relation(MongoDocumentBase):
+    target: ObjectId
+    type: str
+    accessModifier: str
+    parentCardinality: str
+    childCardinality: str
+    parentName: str
+    childName: str
+    name: str
+
+
+@dataclass
+class RelationRepresentation(SerializableObject):
+    relationId: ObjectId
+    # TODO: define data needed.
+
+
+# ATTRIBUTE TYPES
+
+@dataclass
+class AttributeBase(MongoDocumentBase):
+    """
+    Abstract
+    """
+    kind = None
+
+
+@dataclass
+class Property(AttributeBase):
+    value: ...
+    kind: str
+
+
+@dataclass
+class MemberBaseModel(AttributeBase):
+    """
+    Abstract
+    """
+    name: str
+    type: str
+    accessModifier: str
+
+
+@dataclass
+class Field(MemberBaseModel):
+    kind = "field"
+
+
+@dataclass
+class Method(MemberBaseModel):
+    parameters: list  # type: MethodParameter
+    kind = "method"
+
+
+@dataclass
+class MethodParameter(SerializableObject):
+    name: str
+    type: str
+
+
 # MODEL ACTIONS
 # remember to add action field!
 
 @dataclass
-class ModelHistoryBaseAction(SerializableObject):
+class HistoryBaseAction(SerializableObject):
     timestamp: str
     userId: ObjectId
     action = None
 
 
 @dataclass
-class CreateAction(ModelHistoryBaseAction):
-    action: str = "create"
+class CreateModelAction(HistoryBaseAction):
+    action = "createModel"
 
 
 @dataclass
-class AddFieldAction(ModelHistoryBaseAction):
-    field: ModelField
-    action: str = "addField"
+class AddAttributeAction(HistoryBaseAction):
+    item: AttributeBase
+    action = "addAttribute"
 
 
 @dataclass
-class RemoveFieldAction(ModelHistoryBaseAction):
-    fieldId: ObjectId
-    action: str = "removeField"
+class RemoveAttributeAction(HistoryBaseAction):
+    item: AttributeBase
+    itemId: ObjectId
+    action = "removeAttribute"
 
 
 @dataclass
-class AddMethodAction(ModelHistoryBaseAction):
-    field: ModelField
-    action: str = "addMethod"
+class SetAttributeAction(HistoryBaseAction):
+    oldItem: AttributeBase
+    newItem: AttributeBase
+    action = "setAttribute"
 
 
-@dataclass
-class RemoveMethodAction(ModelHistoryBaseAction):
-    fieldId: ObjectId
-    action: str = "removeMethod"
-
-
-@dataclass
-class SetNameAction(ModelHistoryBaseAction):
-    name: str
-    action: str = "setName"
-
-
-# CONCRETE MODEL CLASSES
-# remember to add type field!
-
-@dataclass
-class ClassModel(Model):
-    name: str
-    fields: list  # type: ModelField
-    methods: list  # type: ModelMethod
-    type: str = 'class'
-
-
-@dataclass
-class TextBoxModel(Model):
-    text: str
-    type: str = 'textBox'
-
-
-# MODEL PROPERTY TYPES
-
-@dataclass
-class ModelField(MongoDocumentBase):
-    name: str
-    type: str
-    accessModifier: str
-
-
-@dataclass
-class ModelMethod(MongoDocumentBase):
-    name: str
-    type: str
-    accessModifier: str
+AttributeType = TypeVar('AttributeType', bound=AttributeBase)
+HistoryActionType = TypeVar('HistoryActionType', bound=HistoryBaseAction)
