@@ -65,36 +65,36 @@ class SerializableObject:
         return json.dumps(cls.as_dict_list(lst), default=str)
 
     @classmethod
-    def from_json_list(cls, json_list):
+    def from_json_list(cls, json_list, set_missing_to_none: bool = False):
         """
         Converts a json list to a list of class instances
         """
-        return cls.from_dict_list(json.loads(json_list))
+        return cls.from_dict_list(json.loads(json_list), set_missing_to_none)
 
     @classmethod
-    def from_dict_list(cls, lst: list):
+    def from_dict_list(cls, lst: list, set_missing_to_none: bool = False):
         """
         Converts a list of dicts to a list of class instances
         """
-        return [cls.from_dict(x) for x in lst]
+        return [cls.from_dict(x, set_missing_to_none) for x in lst]
 
     @classmethod
-    def from_json(cls, j: str):
+    def from_json(cls, j: str, set_missing_to_none: bool = False):
         """
         Converts a json object to an instance of the calling class.
 
         Ignores fields that are not defined as fields on the calling class.
 
-        Will fail if all required fields are not present in the dict
+        Will fail if all required fields are not present in the dict unless set_missing_to_none is set to True
+        in which case missing fields will be initialized to None
 
-        Future: Consider adding an option to set missing fields to None
-
+        :param set_missing_to_none:
         :param d: json object to convert
         :return: instance of the calling class
         :param j:
         :return:
         """
-        return cls.from_dict(json.loads(j))
+        return cls.from_dict(json.loads(j, set_missing_to_none))
 
     @classmethod
     def has_field(cls, field_name: str):

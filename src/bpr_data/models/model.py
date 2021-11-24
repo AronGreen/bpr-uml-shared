@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TypeVar
+from typing import TypeVar, List
 
 from bson import ObjectId
 
@@ -13,9 +13,9 @@ class Model(MongoDocumentBase):
     type: str
     projectId: ObjectId
     path: str
-    history: list  # type: HistoryBaseAction
-    relations: list  # type: Relation
-    attributes: list  # type: AttributeBase
+    history: List[HistoryBaseAction]
+    relations: List[Relation]
+    attributes: List[AttributeBase]
 
 
 @dataclass
@@ -84,7 +84,7 @@ class Field(MemberBaseModel):
 
 @dataclass
 class Method(MemberBaseModel):
-    parameters: list  # type: MethodParameter
+    parameters: List[MethodParameter]
     kind = "method"
 
 
