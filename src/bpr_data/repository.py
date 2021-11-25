@@ -56,7 +56,7 @@ class Repository:
     def insert(self,
                collection: Collection,
                item: MongoDocumentBase,
-               return_type: Type[T] = None) -> dict | Type[T]:
+               return_type: Type[T] = None) -> dict | T:
         """
         Inserts a document into the given collection.
         Note that the _id field will be ignored on insertion
@@ -110,7 +110,7 @@ class Repository:
     def find_one(self,
                  collection: Collection,
                  return_type: Type[T] = None,
-                 **kwargs) -> dict | Type[T]:
+                 **kwargs) -> dict | T:
         """
         Find the first item that matches the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
@@ -160,7 +160,7 @@ class Repository:
     def update(self,
                collection: Collection,
                item: MongoDocumentBase,
-               return_type: Type[T] = None) -> dict | Type[T]:
+               return_type: Type[T] = None) -> dict | T:
         """
         Updates a document with new values.
         Document is found by _id
@@ -181,6 +181,30 @@ class Repository:
         if return_type is not None:
             return return_type.from_dict(result)
         return result
+
+    def update_list_item(self,
+                         collection: Collection,
+                         document_id: ObjectId,
+                         field_name: str,
+                         field_query,
+                         item) -> bool:
+        """
+        Update item in an list on a document based on `field_query`.
+        Only the first item matching the field_query will be modified.
+        :param collection: Collection to find document in
+        :param document_id: Id of document to modify
+        :param field_name: field containing the array to modify. ex: 'array_items'
+        :param field_query: array level query. ex: {'array_items.id': '1'}
+        :param item: value that will replace the current list item. ex: {'id': '1', 'value':'newVal'}
+        :return:
+        """
+        field_query['_id'] = document_id
+        update = {'$set': {f'{field_name}.$': item}}
+        updated = self.__get_collection(collection).update_one(
+            field_query,
+            update
+        )
+        return updated.modified_count > 0
 
     def push(self,
              collection: Collection,
@@ -311,7 +335,7 @@ class Repository:
 
     def aggregate(self,
                   collection: Collection,
-                  pipeline: list, 
+                  pipeline: list,
                   return_type: Type[T] = None) -> list:
         """
         Build custom aggregations on a collection.
@@ -326,6 +350,15 @@ class Repository:
         if return_type is not None:
             return return_type.from_dict_list(result)
         return result
+
+    # TODO: When testing is back up, add this
+    def __sanitized_kwargs(self, **kwargs) -> dict:
+        if kwargs.get('id') is not None:
+            kwargs['_id'] = ObjectId(kwargs['id'])
+            del kwargs['id']
+        if '_id' in kwargs and not isinstance(kwargs['_id'], ObjectId):
+            raise TypeError("_id field must be of type ObjectId")
+        return kwargs
 
     def __get_collection(self, collection: Collection):
         if self.__client is None:

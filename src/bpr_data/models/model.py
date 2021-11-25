@@ -79,13 +79,13 @@ class MemberBaseModel(AttributeBase):
 
 @dataclass
 class Field(MemberBaseModel):
-    kind = "field"
+    kind: str = "field"
 
 
 @dataclass
 class Method(MemberBaseModel):
     parameters: List[MethodParameter]
-    kind = "method"
+    kind: str = "method"
 
 
 @dataclass
@@ -117,7 +117,6 @@ class AddAttributeAction(HistoryBaseAction):
 
 @dataclass
 class RemoveAttributeAction(HistoryBaseAction):
-    item: AttributeBase
     itemId: ObjectId
     action = "removeAttribute"
 
