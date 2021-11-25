@@ -153,5 +153,17 @@ class SetAttributeAction(HistoryBaseAction):
     action = "setAttribute"
 
 
+@dataclass
+class AddRelationAction(HistoryBaseAction):
+    item: Relation
+    action = "addRelation"
+
+
+@dataclass
+class RemoveRelationAction(HistoryBaseAction):
+    itemId: ObjectId
+    action = "removeRelation"
+
+
 AttributeType = TypeVar('AttributeType', bound=AttributeBase)
 HistoryActionType = TypeVar('HistoryActionType', bound=HistoryBaseAction)
