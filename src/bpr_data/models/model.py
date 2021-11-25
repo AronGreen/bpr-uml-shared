@@ -62,9 +62,10 @@ class AttributeBase(MongoDocumentBase):
     kind = None
 
     @staticmethod
-    def parse(data: str | dict):
+    def parse(data: str | dict, set_missing_to_none: bool = False):
         """
         Converts the given data to the correct type inferred by the `type` field in the data.
+        :param set_missing_to_none: sets missing fields to None
         :param data: json or dict with a representation of a subclass of AttributeBase
         :return: the parsed AttributeBase subclass
         """
@@ -77,11 +78,11 @@ class AttributeBase(MongoDocumentBase):
 
         # Add additional types here
         if data['kind'] == 'field':
-            return Field.from_dict(data)
+            return Field.from_dict(data, set_missing_to_none)
         if data['kind'] == 'method':
-            return Method.from_dict(data)
+            return Method.from_dict(data, set_missing_to_none)
         else:
-            return Property.from_dict(data)
+            return Property.from_dict(data, set_missing_to_none)
 
 
 @dataclass
