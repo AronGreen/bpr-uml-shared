@@ -198,6 +198,8 @@ class Repository:
         :param item: value that will replace the current list item. ex: {'id': '1', 'value':'newVal'}
         :return:
         """
+        if isinstance(item, SerializableObject):
+            item = item.as_dict()
         field_query['_id'] = document_id
         update = {'$set': {f'{field_name}.$': item}}
         updated = self.__get_collection(collection).update_one(

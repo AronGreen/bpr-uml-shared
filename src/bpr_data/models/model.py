@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from typing import TypeVar, List
 
@@ -13,9 +14,9 @@ class Model(MongoDocumentBase):
     type: str
     projectId: ObjectId
     path: str
-    history: List[HistoryBaseAction]
-    relations: List[Relation]
-    attributes: List[AttributeBase]
+    history: list  # type: HistoryBaseAction
+    relations: list  # type: Relation
+    attributes: list  # type: AttributeBase
 
 
 @dataclass
@@ -60,9 +61,32 @@ class AttributeBase(MongoDocumentBase):
     """
     kind = None
 
+    @staticmethod
+    def parse(data: str | dict):
+        """
+        Converts the given data to the correct type inferred by the `type` field in the data.
+        :param data: json or dict with a representation of a subclass of AttributeBase
+        :return: the parsed AttributeBase subclass
+        """
+        if type(data) is str:
+            data = json.loads(data)
+        if type(data) is not dict:
+            raise TypeError
+        if 'kind' not in data:
+            raise KeyError
+
+        # Add additional types here
+        if data['kind'] == 'field':
+            return Field.from_dict(data)
+        if data['kind'] == 'method':
+            return Method.from_dict(data)
+        else:
+            return Property.from_dict(data)
+
 
 @dataclass
 class Property(AttributeBase):
+    """Catch all attribute type"""
     value: ...
     kind: str
 
@@ -84,7 +108,7 @@ class Field(MemberBaseModel):
 
 @dataclass
 class Method(MemberBaseModel):
-    parameters: List[MethodParameter]
+    parameters: list  # type: MethodParameter
     kind: str = "method"
 
 
