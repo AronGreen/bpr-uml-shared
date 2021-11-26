@@ -23,6 +23,7 @@ class Model(MongoDocumentBase):
 class ModelRepresentation(MongoDocumentBase):
     modelId: ObjectId
     diagramId: ObjectId
+    relations: list  # type: RelationRepresentation
     x: float
     y: float
     w: float
@@ -47,7 +48,7 @@ class Relation(MongoDocumentBase):
 
 
 @dataclass
-class RelationRepresentation(SerializableObject):
+class RelationRepresentation(MongoDocumentBase):
     relationId: ObjectId
     # TODO: define data needed.
 
