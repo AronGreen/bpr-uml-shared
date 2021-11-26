@@ -85,24 +85,22 @@ class Repository:
         """
         Find all items matching the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
-        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query as `_id`.
+        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query
+        as `_id`.
         :param collection: collection to search
         :param kwargs: search params in key-value form
         :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: the resulting list of items as dicts
         """
-        if kwargs.get('id') is not None:
-            if isinstance(kwargs['id'], str):
-                kwargs['_id'] = ObjectId(kwargs['id'])
-            del kwargs['id']
+        __kwargs = self.__sanitized_kwargs(**kwargs)
 
-        if kwargs.get('nested_conditions') is not None:
-            nested_conditions = kwargs.get('nested_conditions')
+        if __kwargs.get('nested_conditions') is not None:
+            nested_conditions = __kwargs.get('nested_conditions')
             for item in nested_conditions.keys():
-                kwargs[item] = nested_conditions[item]
-            kwargs.pop("nested_conditions")
+                __kwargs[item] = nested_conditions[item]
+            __kwargs.pop("nested_conditions")
 
-        results = list(self.__get_collection(collection).find(kwargs))
+        results = list(self.__get_collection(collection).find(__kwargs))
         if return_type is not None:
             return return_type.from_dict_list(results)
         return results
@@ -114,18 +112,16 @@ class Repository:
         """
         Find the first item that matches the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
-        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query as `_id`.
+        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query
+        as `_id`.
         :param collection: collection to search
         :param kwargs: search params in key-value form
         :param return_type: Optional! Subclass of SerializableObject to cast result to
         :return: the first item matching the query
         """
-        if kwargs.get('id') is not None:
-            if isinstance(kwargs['id'], str):
-                kwargs['_id'] = ObjectId(kwargs['id'])
-            del kwargs['id']
+        __kwargs = self.__sanitized_kwargs(**kwargs)
 
-        result = self.__get_collection(collection).find_one(kwargs)
+        result = self.__get_collection(collection).find_one(__kwargs)
         if return_type is not None:
             return return_type.from_dict(result)
         return result
@@ -136,16 +132,15 @@ class Repository:
         """
         Delete the first item that matches the query in kwargs.
         Note that `_id` must be of type ObjectId if used.
-        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query as `_id`.
+        A special parameter, `id`, will automatically be converted from string to ObjectId and be used in the query
+        as `_id`.
         :param collection: collection to delete from
         :param kwargs: search params in key-value form
         :return: True if an item was deleted, otherwise False
         """
-        if kwargs.get('id') is not None:
-            if isinstance(kwargs['id'], str):
-                kwargs['_id'] = ObjectId(kwargs['id'])
-            del kwargs['id']
-        delete_result = self.__get_collection(collection).delete_one(kwargs)
+        __kwargs = self.__sanitized_kwargs(**kwargs)
+
+        delete_result = self.__get_collection(collection).delete_one(__kwargs)
         return delete_result.deleted_count > 0
 
     def __purge(self, collection: Collection):
@@ -287,7 +282,8 @@ class Repository:
              return_type: Type[T] = None,
              **match_args) -> list:
         """
-        Returns results from the `local_collection` with the matching documents in the `foreign_collection` as sub-documents.
+        Returns results from the `local_collection` with the matching documents in the `foreign_collection` as
+        sub-documents.
 
         Equivalent to a left outer join.
 
@@ -353,7 +349,6 @@ class Repository:
             return return_type.from_dict_list(result)
         return result
 
-    # TODO: When testing is back up, add this
     def __sanitized_kwargs(self, **kwargs) -> dict:
         if kwargs.get('id') is not None:
             kwargs['_id'] = ObjectId(kwargs['id'])
