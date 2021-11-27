@@ -132,7 +132,7 @@ class HistoryBaseAction(SerializableObject):
 
 @dataclass
 class CreateModelAction(HistoryBaseAction):
-    action = "createModel"
+    action: str = "createModel"
 
 
 @dataclass
@@ -144,26 +144,26 @@ class AddAttributeAction(HistoryBaseAction):
 @dataclass
 class RemoveAttributeAction(HistoryBaseAction):
     itemId: ObjectId
-    action = "removeAttribute"
+    action: str = "removeAttribute"
 
 
 @dataclass
 class SetAttributeAction(HistoryBaseAction):
     oldItem: AttributeBase
     newItem: AttributeBase
-    action = "setAttribute"
+    action: str = "setAttribute"
 
 
 @dataclass
 class AddRelationAction(HistoryBaseAction):
     item: Relation
-    action = "addRelation"
+    action: str = "addRelation"
 
 
 @dataclass
 class RemoveRelationAction(HistoryBaseAction):
     itemId: ObjectId
-    action = "removeRelation"
+    action: str = "removeRelation"
 
 
 AttributeType = TypeVar('AttributeType', bound=AttributeBase)
