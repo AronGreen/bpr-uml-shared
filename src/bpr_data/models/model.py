@@ -138,7 +138,7 @@ class CreateModelAction(HistoryBaseAction):
 @dataclass
 class AddAttributeAction(HistoryBaseAction):
     item: AttributeBase
-    action = "addAttribute"
+    action: str = "addAttribute"
 
 
 @dataclass
@@ -148,16 +148,23 @@ class RemoveAttributeAction(HistoryBaseAction):
 
 
 @dataclass
-class SetAttributeAction(HistoryBaseAction):
+class UpdateAttributeAction(HistoryBaseAction):
     oldItem: AttributeBase
     newItem: AttributeBase
-    action: str = "setAttribute"
+    action: str = "updateAttribute"
 
 
 @dataclass
-class AddRelationAction(HistoryBaseAction):
+class CreateRelationAction(HistoryBaseAction):
     item: Relation
-    action: str = "addRelation"
+    action: str = "createRelation"
+
+
+@dataclass
+class UpdateRelationAction(HistoryBaseAction):
+    oldItem: Relation
+    newItem: Relation
+    action: str = "updateRelation"
 
 
 @dataclass
