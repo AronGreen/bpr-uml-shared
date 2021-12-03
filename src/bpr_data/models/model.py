@@ -23,6 +23,7 @@ class Model(MongoDocumentBase):
 class ModelRepresentation(MongoDocumentBase):
     modelId: ObjectId
     diagramId: ObjectId
+    relations: list  # type: RelationRepresentation
     x: float
     y: float
     w: float
@@ -47,7 +48,7 @@ class Relation(MongoDocumentBase):
 
 
 @dataclass
-class RelationRepresentation(SerializableObject):
+class RelationRepresentation(MongoDocumentBase):
     relationId: ObjectId
     # TODO: define data needed.
 
@@ -131,38 +132,45 @@ class HistoryBaseAction(SerializableObject):
 
 @dataclass
 class CreateModelAction(HistoryBaseAction):
-    action = "createModel"
+    action: str = "createModel"
 
 
 @dataclass
 class AddAttributeAction(HistoryBaseAction):
     item: AttributeBase
-    action = "addAttribute"
+    action: str = "addAttribute"
 
 
 @dataclass
 class RemoveAttributeAction(HistoryBaseAction):
     itemId: ObjectId
-    action = "removeAttribute"
+    action: str = "removeAttribute"
 
 
 @dataclass
-class SetAttributeAction(HistoryBaseAction):
+class UpdateAttributeAction(HistoryBaseAction):
     oldItem: AttributeBase
     newItem: AttributeBase
-    action = "setAttribute"
+    action: str = "updateAttribute"
 
 
 @dataclass
-class AddRelationAction(HistoryBaseAction):
+class CreateRelationAction(HistoryBaseAction):
     item: Relation
-    action = "addRelation"
+    action: str = "createRelation"
+
+
+@dataclass
+class UpdateRelationAction(HistoryBaseAction):
+    oldItem: Relation
+    newItem: Relation
+    action: str = "updateRelation"
 
 
 @dataclass
 class RemoveRelationAction(HistoryBaseAction):
     itemId: ObjectId
-    action = "removeRelation"
+    action: str = "removeRelation"
 
 
 AttributeType = TypeVar('AttributeType', bound=AttributeBase)

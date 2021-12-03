@@ -94,7 +94,7 @@ class SerializableObject:
         :param j:
         :return:
         """
-        return cls.from_dict(json.loads(j, set_missing_to_none))
+        return cls.from_dict(json.loads(j), set_missing_to_none)
 
     @classmethod
     def has_field(cls, field_name: str):
