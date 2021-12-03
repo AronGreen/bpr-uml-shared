@@ -2,8 +2,10 @@ from enum import Enum, auto
 
 
 class WorkspacePermission(Enum):
-    MANAGE_PROJECTS = auto()
-    MANAGE_TEAMS = auto()
-    MANAGE_PERMISSIONS = auto()
-    MANAGE_WORKSPACE = auto()
-    MANAGE_USERS = auto()
+    MANAGE_TEAMS = "MANAGE_TEAMS"
+    MANAGE_PERMISSIONS = "MANAGE_PERMISSIONS"
+    MANAGE_WORKSPACE = "MANAGE_WORKSPACE"
+    MANAGE_USERS = "MANAGE_USERS"
+
+class ProjectPermission(Enum):
+    MANAGE_PROJECTS = "MANAGE_PROJECTS"
