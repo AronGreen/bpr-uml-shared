@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
 
-class Permission(Enum):
+class WorkspacePermission(Enum):
     MANAGE_PROJECTS = auto()
     MANAGE_TEAMS = auto()
     MANAGE_PERMISSIONS = auto()
