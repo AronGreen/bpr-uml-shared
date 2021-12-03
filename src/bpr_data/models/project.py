@@ -15,6 +15,7 @@ class Project(MongoDocumentBase):
 class ProjectUser(ObjectIdReferencer):
     userId: ObjectId
     isEditor: bool
+    isProjectManager: bool
 
 
 @dataclass
