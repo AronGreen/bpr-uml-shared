@@ -9,6 +9,7 @@ class Project(MongoDocumentBase):
     workspaceId: ObjectId
     users: list  # ProjectUser
     teams: list  # ProjectTeam
+    folders: list  # str
 
 
 @dataclass
