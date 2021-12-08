@@ -349,6 +349,19 @@ class Repository:
             return return_type.from_dict_list(result)
         return result
 
+    def cleanup_relations(self, collection: Collection, field_name: str, match: dict) -> None:
+        """
+        Removes related object from lists in the given collection.
+
+        :param collection: Collection to clean up
+        :param field_name: field containing array of relations
+        :param match: the values to match
+        :return: None
+        """
+        affected = self.find(collection, **{field_name: {'$elemMatch': match}})
+        for item in affected:
+            self.pull(collection, item['_id'], field_name, match)
+
     def __sanitized_kwargs(self, **kwargs) -> dict:
         if kwargs.get('id') is not None:
             kwargs['_id'] = ObjectId(kwargs['id'])
