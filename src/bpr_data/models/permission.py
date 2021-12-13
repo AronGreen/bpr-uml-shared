@@ -1,13 +1,13 @@
-from enum import Enum, auto
+from enum import Enum
+from dataclasses import dataclass
 
-from bpr_data.models.mongo_document_base import SerializableObject
-
-
+@dataclass
 class WorkspacePermission(str, Enum):
     MANAGE_TEAMS = "MANAGE_TEAMS"
     MANAGE_PERMISSIONS = "MANAGE_PERMISSIONS"
     MANAGE_WORKSPACE = "MANAGE_WORKSPACE"
 
+    @classmethod
     def convert_strings_to_workspace_permissions_enums(permissions: list):
         enum_permissions = []
         for permission in permissions:
