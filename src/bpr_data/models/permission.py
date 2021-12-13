@@ -8,7 +8,7 @@ class WorkspacePermission(str, Enum):
     MANAGE_WORKSPACE = "MANAGE_WORKSPACE"
 
     @classmethod
-    def convert_strings_to_workspace_permissions_enums(permissions: list):
+    def convert_strings_to_workspace_permissions_enums(cls, permissions: list):
         enum_permissions = []
         for permission in permissions:
             enum_permissions.append(WorkspacePermission(permission))
