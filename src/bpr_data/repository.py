@@ -41,8 +41,7 @@ class Repository:
             Repository(protocol, user, pw, host, default_db)
         return Repository.__instance
 
-    def __init__(self,
-                 protocol, user, pw, host, default_db):
+    def __init__(self, protocol, user, pw, host, default_db):
         if Repository.__instance is not None:
             raise Exception("Singleton class! Use get_instance()")
         else:

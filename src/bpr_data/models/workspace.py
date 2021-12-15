@@ -10,6 +10,7 @@ class Workspace(MongoDocumentBase):
     name: str
     users: list
 
+
 @dataclass
 class WorkspaceUser(SerializableObject):
     userId: ObjectId
